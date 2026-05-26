@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Over 40 Body Check | Fitbodies by MK</title>
+  <meta name="description" content="Find out exactly where your body stands after 40. Take the free 2-minute health check — built for busy 40+ professionals who want honest answers." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:#0A1628;min-height:100vh;color:#fff;}
+    h1,h2,h3{font-family:'Oswald',sans-serif;}
+
+    .bg-glow{
+      position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(245,120,42,.13) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 95% 100%, rgba(245,120,42,.07) 0%, transparent 50%);
+    }
+
+    .header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      height:58px;padding:0 24px;
+      display:flex;align-items:center;justify-content:space-between;
+      background:rgba(10,22,40,.9);backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .logo{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:.05em;color:#fff;display:flex;align-items:center;gap:9px;text-decoration:none;}
+    .logo-dot{width:8px;height:8px;background:#F5782A;border-radius:50%;flex-shrink:0;}
+    .header-tag{font-size:12px;color:rgba(255,255,255,.28);font-weight:500;}
+
+    .screen{position:relative;z-index:1;min-height:100vh;padding-top:58px;display:flex;flex-direction:column;justify-content:center;}
+    .inner{max-width:540px;margin:0 auto;padding:48px 24px 72px;width:100%;}
+
+    .label{font-size:11px;font-weight:700;color:#F5782A;text-transform:uppercase;letter-spacing:.18em;display:block;margin-bottom:18px;}
+
+    .answer-card{
+      background:rgba(255,255,255,.04);
+      border:1.5px solid rgba(255,255,255,.08);
+      border-radius:14px;padding:17px 20px;cursor:pointer;
+      color:rgba(255,255,255,.78);font-size:15px;font-family:'Inter',sans-serif;
+      width:100%;text-align:left;margin-bottom:10px;
+      display:flex;align-items:flex-start;gap:14px;line-height:1.5;
+      transition:border-color .14s,background .14s,transform .1s;
+    }
+    .answer-card:hover{border-color:#F5782A;background:rgba(245,120,42,.08);transform:translateX(3px);}
+    .answer-card.selected{border-color:#F5782A;background:rgba(245,120,42,.13);color:#fff;}
+
+    .radio{
+      width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-radius:50%;
+      flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+      transition:border-color .14s,background .14s;
+    }
+    .answer-card.selected .radio{border-color:#F5782A;background:#F5782A;}
+
+    .btn{
+      font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;letter-spacing:.03em;
+      padding:17px 32px;border-radius:14px;border:none;cursor:pointer;width:100%;
+      display:block;text-align:center;text-decoration:none;
+      transition:opacity .14s,transform .1s;
+    }
+    .btn-primary{background:#F5782A;color:#fff;}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-primary:disabled{opacity:.32;cursor:not-allowed;transform:none;}
+    .btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.22);}
+    .btn-outline:hover{border-color:rgba(255,255,255,.55);}
+
+    input[type=text],input[type=email]{
+      background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);
+      border-radius:12px;padding:15px 18px;font-size:15px;color:#fff;
+      font-family:'Inter',sans-serif;width:100%;outline:none;
+      transition:border-color .14s,background .14s;
+    }
+    input:focus{border-color:#F5782A;background:rgba(245,120,42,.05);}
+    input::placeholder{color:rgba(255,255,255,.22);}
+
+    .check-row{display:flex;align-items:flex-start;gap:11px;font-size:14px;color:rgba(255,255,255,.58);line-height:1.55;margin-bottom:11px;}
+    .check-row:last-child{margin-bottom:0;}
+    .chk{color:#F5782A;flex-shrink:0;margin-top:2px;}
+
+    .fade-in{animation:fi .3s ease;}
+    @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header class="header">
+  <a class="logo" href="#">
+    <span class="logo-dot"></span>FITBODIES BY MK
+  </a>
+  <span class="header-tag">Over 40 Body Check</span>
+</header>
+
+<div id="app"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+var SKOOL_URL     = 'https://www.skool.com/fitbodies-after-35-3151';
+var CALENDLY_URL  = 'https://calendly.com/thartzr22/30min';
+// Sign up free at formspree.io → New Form → copy the endpoint URL and paste below
+var FORMSPREE_URL = 'https://formspree.io/f/mvzywykn';
+
+// ── QUESTIONS ─────────────────────────────────────────────────────────────────
+var QUESTIONS = [
+  {
+    q: 'How well are you sleeping most nights?',
+    answers: [
+      { text: '7+ hours — I wake up rested and ready',        score: 3 },
+      { text: 'Hit and miss — some nights good, some rough',  score: 2 },
+      { text: 'Rarely sleep well. I wake up exhausted',       score: 1 },
+    ]
+  },
+  {
+    q: 'How are your energy levels through the day?',
+    answers: [
+      { text: 'Consistent — no afternoon crash, no caffeine crutch', score: 3 },
+      { text: 'Dips in the afternoon but I manage',                   score: 2 },
+      { text: 'Tired most of the day, running on willpower',          score: 1 },
+    ]
+  },
+  {
+    q: 'How often are you currently exercising?',
+    answers: [
+      { text: '3+ times a week, consistently',           score: 3 },
+      { text: '1–2 times a week, or some weeks nothing', score: 2 },
+      { text: 'Rarely or not at all right now',          score: 1 },
+    ]
+  },
+  {
+    q: 'How would you describe your eating habits?',
+    answers: [
+      { text: 'Mostly balanced — I eat well most of the time',         score: 3 },
+      { text: 'Inconsistent — healthy spells broken by bad habits',    score: 2 },
+      { text: 'Mostly convenience food, not much structure',           score: 1 },
+    ]
+  },
+  {
+    q: 'How are your stress levels day to day?',
+    answers: [
+      { text: 'Manageable — I have ways to decompress and I use them', score: 3 },
+      { text: 'Moderate — life is busy but I cope most of the time',   score: 2 },
+      { text: 'High — work, family, life feels relentless right now',  score: 1 },
+    ]
+  },
+  {
+    q: 'How do you feel physically in your body right now?',
+    answers: [
+      { text: 'Strong and capable — I move well and feel good',              score: 3 },
+      { text: 'A bit stiffer, slower or heavier than I used to feel',        score: 2 },
+      { text: 'Noticeably weaker, heavier or less mobile than I used to be', score: 1 },
+    ]
+  },
+  {
+    q: 'When life gets busy, health is usually the first thing to go.',
+    answers: [
+      { text: 'Rarely — I protect my routine even when things pile up',       score: 3 },
+      { text: 'Sometimes — I fall off but usually find my way back',          score: 2 },
+      { text: 'Almost always — I can\'t stay consistent when life gets hard', score: 1 },
+    ]
+  },
+  {
+    q: 'Overall, how in control of your health do you feel right now?',
+    answers: [
+      { text: 'In control — I have a plan and I\'m following it',                   score: 3 },
+      { text: 'Somewhat — I know what to do but struggle to stay consistent',       score: 2 },
+      { text: 'Not in control — I feel like I\'m losing ground and need to change', score: 1 },
+    ]
+  },
+];
+
+// ── RESULTS ──────────────────────────────────────────────────────────────────
+var RESULTS = {
+  foundation: {
+    label:       'Time to Reset',
+    color:       '#EF4444',
+    barColor:    'linear-gradient(90deg,#EF4444,#F87171)',
+    bgColor:     'rgba(239,68,68,.09)',
+    borderColor: 'rgba(239,68,68,.22)',
+    icon:        '🔴',
+    headline:    'Your Body Is Asking for Help',
+    body:        'Multiple things are stacking against you — poor sleep, high stress, low energy, and inconsistent habits all feeding into each other. This is the pattern that leads to weight gain, injury, and the feeling that your body is going backwards. The good news? This stage responds fast to the right structure. You don\'t need to overhaul everything at once. You need one clear starting point and someone in your corner.',
+    points:      ['Start with sleep and stress — they unlock everything else', 'Short, consistent sessions beat long, sporadic ones every time', 'Nutrition structure matters far more than perfection right now'],
+    cta:         'Fitbodies After 40 is a free community built for people exactly where you are — real guidance, zero judgment, real progress.',
+  },
+  building: {
+    label:       'Building Momentum',
+    color:       '#F59E0B',
+    barColor:    'linear-gradient(90deg,#F59E0B,#FCD34D)',
+    bgColor:     'rgba(245,158,11,.09)',
+    borderColor: 'rgba(245,158,11,.22)',
+    icon:        '🟡',
+    headline:    'You\'re Closer Than You Think',
+    body:        'You\'ve got real foundations — but gaps are holding you back. Maybe your training isn\'t built for your 40s body, your nutrition falls apart when life gets busy, or recovery isn\'t getting the attention it deserves. You\'re not far from a real breakthrough. What\'s missing isn\'t motivation. It\'s a clear, personalised plan and the accountability to close those gaps.',
+    points:      ['Your training needs to work with your recovery, not against it', 'Structured nutrition beats "eating clean" without a system', 'Consistency at 80% over time beats perfection once a month'],
+    cta:         'Join Fitbodies After 40 and connect with others building real momentum in their 40s and 50s — supported by expert coaching.',
+  },
+  optimising: {
+    label:       'Ready to Level Up',
+    color:       '#10B981',
+    barColor:    'linear-gradient(90deg,#10B981,#34D399)',
+    bgColor:     'rgba(16,185,129,.09)',
+    borderColor: 'rgba(16,185,129,.22)',
+    icon:        '🟢',
+    headline:    'You\'ve Done the Work. Now Optimise.',
+    body:        'You\'re ahead of most people your age — and you know that staying here takes real, consistent effort. Now it\'s about fine-tuning: smarter training, better recovery, dialling in nutrition, and building a body that performs well into your 50s, 60s and beyond. The ceiling from here is higher than you think.',
+    points:      ['Periodisation and recovery are your biggest levers now', 'Protein targets and timing unlock your next level of body composition', 'Longevity-focused training protects your gains for the decades ahead'],
+    cta:         'Join Fitbodies After 40 to connect with others levelling up — and get the expert guidance that pushes you past the plateau.',
+  },
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var state = {
+  screen:     'start',
+  current:    0,
+  selected:   null,
+  answers:    [],
+  name:       '',
+  email:      '',
+  submitting: false,
+  error:      '',
+};
+
+function getTotal() { return state.answers.reduce(function(a,b){ return a+b; }, 0); }
+function getResultKey() {
+  var t = getTotal();
+  if (t <= 13) return 'foundation';
+  if (t <= 18) return 'building';
+  return 'optimising';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  var app = document.getElementById('app');
+  if      (state.screen === 'start')   app.innerHTML = renderStart();
+  else if (state.screen === 'quiz')    app.innerHTML = renderQuiz();
+  else if (state.screen === 'capture') app.innerHTML = renderCapture();
+  else if (state.screen === 'results') app.innerHTML = renderResults();
+  void app.offsetWidth;
+  app.className = 'fade-in';
+  attachListeners();
+}
+
+function chkSvg() {
+  return '<svg class="chk" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+}
+
+// START ────────────────────────────────────────────────────────────────────────
+function renderStart() {
+  var topics = ['Sleep quality','Daily energy','Training habits','Nutrition patterns','Stress levels','Consistency score'];
+  var topicsHtml = topics.map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.5);">'
+      + '<svg width="13" height="13" fill="none" stroke="#F5782A" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>'
+      + t + '</div>';
+  }).join('');
+
+  return '<div class="screen"><div class="inner">'
+    + '<span class="label">Free · Takes 2 Minutes</span>'
+    + '<h1 style="font-size:clamp(44px,11vw,64px);line-height:1.0;font-weight:700;margin-bottom:20px;">The Over 40<br><span style="color:#F5782A;">Body Check</span></h1>'
+    + '<p style="font-size:17px;color:rgba(255,255,255,.58);line-height:1.7;margin-bottom:36px;max-width:400px;">8 honest questions. A personalised score. Real advice on what to do next — not a generic plan, not a sales pitch.</p>'
+    + '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px 24px;margin-bottom:36px;">'
+    + '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;">This quiz covers</p>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">' + topicsHtml + '</div>'
+    + '</div>'
+    + '<button id="btn-start" class="btn btn-primary" style="margin-bottom:14px;">Start the Body Check →</button>'
+    + '<p style="text-align:center;font-size:12px;color:rgba(255,255,255,.18);">Free · No spam · Honest feedback from a real coach</p>'
+    + '</div></div>';
+}
+
+// QUIZ ─────────────────────────────────────────────────────────────────────────
+function renderQuiz() {
+  var q   = QUESTIONS[state.current];
+  var tot = QUESTIONS.length;
+  var pct = Math.round((state.current / tot) * 100);
+
+  var answersHtml = q.answers.map(function(a, i) {
+    var sel = state.selected === i;
+    return '<button class="answer-card' + (sel ? ' selected' : '') + '" data-idx="' + i + '">'
+      + '<span class="radio">'
+      + (sel ? '<svg width="9" height="9" fill="#fff" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3"/></svg>' : '')
+      + '</span><span>' + a.text + '</span></button>';
+  }).join('');
+
+  return '<div class="screen"><div class="inner" style="padding-top:32px;">'
+    + '<div style="margin-bottom:32px;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
+    + '<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;">'
+    + 'Q' + (state.current+1) + ' <span style="color:rgba(255,255,255,.15);">/ ' + tot + '</span></span>'
+    + '<span style="font-size:13px;font-weight:700;color:#F5782A;">' + pct + '%</span>'
+    + '</div>'
+    + '<div style="background:rgba(255,255,255,.08);border-radius:99px;height:4px;">'
+    + '<div style="background:linear-gradient(90deg,#F5782A,#ff9b57);height:4px;border-radius:99px;width:' + pct + '%;transition:width .4s ease;"></div>'
+    + '</div></div>'
+    + '<h2 style="font-size:clamp(22px,5.5vw,30px);font-weight:700;color:#fff;line-height:1.25;margin-bottom:26px;">' + q.q + '</h2>'
+    + '<div style="margin-bottom:28px;">' + answersHtml + '</div>'
+    + '<button id="btn-next" class="btn btn-primary" ' + (state.selected === null ? 'disabled' : '') + '>'
+    + (state.current < tot - 1 ? 'Next →' : 'See My Results →')
+    + '</button></div></div>';
+}
+
+// CAPTURE ─────────────────────────────────────────────────────────────────────
+function renderCapture() {
+  return '<div class="screen"><div class="inner">'
+    + '<span class="label">Almost there</span>'
+    + '<h2 style="font-size:clamp(30px,8vw,46px);font-weight:700;line-height:1.05;margin-bottom:14px;">Your results<br>are ready.</h2>'
+    + '<p style="font-size:15px;color:rgba(255,255,255,.48);line-height:1.65;margin-bottom:30px;">Enter your details below to unlock your personalised score and recommendations.</p>'
+    + '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 20px;margin-bottom:28px;">'
+    + '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;">You\'ll receive</p>'
+    + '<div class="check-row">' + chkSvg() + 'Your personalised body check score</div>'
+    + '<div class="check-row">' + chkSvg() + 'The key areas dragging your score down</div>'
+    + '<div class="check-row">' + chkSvg() + 'Specific next steps based on your result</div>'
+    + '</div>'
+    + '<div style="margin-bottom:14px;">'
+    + '<label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">First Name</label>'
+    + '<input type="text" id="input-name" placeholder="Your first name" value="' + escHtml(state.name) + '" />'
+    + '</div>'
+    + '<div style="margin-bottom:24px;">'
+    + '<label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Email Address</label>'
+    + '<input type="email" id="input-email" placeholder="your@email.com" value="' + escHtml(state.email) + '" />'
+    + '</div>'
+    + (state.error ? '<p style="color:#FCA5A5;font-size:13px;margin-bottom:16px;padding:12px 16px;background:rgba(252,165,165,.08);border-radius:10px;">' + state.error + '</p>' : '')
+    + '<button id="btn-submit" class="btn btn-primary" ' + (state.submitting ? 'disabled' : '') + '>'
+    + (state.submitting ? 'One moment…' : 'Unlock My Results →')
+    + '</button>'
+    + '<p style="font-size:11px;color:rgba(255,255,255,.18);text-align:center;margin-top:14px;line-height:1.5;">No spam. No selling your data. Unsubscribe anytime.</p>'
+    + '</div></div>';
+}
+
+// RESULTS ─────────────────────────────────────────────────────────────────────
+function renderResults() {
+  var key    = getResultKey();
+  var result = RESULTS[key];
+  var total  = getTotal();
+  var max    = QUESTIONS.length * 3;
+  var pct    = Math.round((total / max) * 100);
+
+  var pointsHtml = result.points.map(function(p){
+    return '<div class="check-row">' + chkSvg() + '<span>' + p + '</span></div>';
+  }).join('');
+
+  return '<div class="screen" style="justify-content:flex-start;"><div class="inner">'
+    + '<span class="label">Your Results' + (state.name ? ' · ' + state.name : '') + '</span>'
+    // Score card
+    + '<div style="background:' + result.bgColor + ';border:1.5px solid ' + result.borderColor + ';border-radius:20px;padding:22px 24px;margin-bottom:28px;display:flex;align-items:center;gap:20px;">'
+    + '<div style="flex:1;">'
+    + '<p style="font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Your score</p>'
+    + '<p style="font-family:Oswald,sans-serif;font-size:40px;font-weight:700;color:#fff;line-height:1;">'
+    + total + '<span style="font-size:22px;color:rgba(255,255,255,.28);"> / ' + max + '</span></p>'
+    + '<p style="font-family:Oswald,sans-serif;font-size:17px;font-weight:600;color:' + result.color + ';margin-top:5px;">' + result.label + '</p>'
+    + '</div>'
+    + '<div style="width:72px;height:72px;border-radius:50%;background:' + result.bgColor + ';border:3px solid ' + result.color + ';display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;">' + result.icon + '</div>'
+    + '</div>'
+    // Bar
+    + '<div style="margin-bottom:32px;">'
+    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.22);margin-bottom:8px;">'
+    + '<span>Needs work</span><span>Strong</span></div>'
+    + '<div style="background:rgba(255,255,255,.08);border-radius:99px;height:7px;">'
+    + '<div style="background:' + result.barColor + ';height:7px;border-radius:99px;width:' + pct + '%;transition:width .6s ease;"></div>'
+    + '</div></div>'
+    // Headline + body
+    + '<h2 style="font-size:clamp(26px,6vw,36px);font-weight:700;color:#fff;line-height:1.2;margin-bottom:16px;">' + result.headline + '</h2>'
+    + '<p style="font-size:15px;color:rgba(255,255,255,.62);line-height:1.8;margin-bottom:28px;">' + result.body + '</p>'
+    // Focus points
+    + '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px 22px;margin-bottom:28px;">'
+    + '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">Where to focus</p>'
+    + pointsHtml
+    + '</div>'
+    // CTAs
+    + '<div style="background:rgba(245,120,42,.08);border:1.5px solid rgba(245,120,42,.2);border-radius:20px;padding:24px;margin-bottom:12px;">'
+    + '<p style="font-size:11px;font-weight:700;color:#F5782A;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">What\'s next</p>'
+    + '<p style="font-size:14px;color:rgba(255,255,255,.58);line-height:1.7;margin-bottom:22px;">' + result.cta + '</p>'
+    + '<a href="' + SKOOL_URL + '" target="_blank" rel="noopener" style="text-decoration:none;display:block;margin-bottom:10px;"><button class="btn btn-primary">Join Fitbodies After 40 — Free</button></a>'
+    + '<a href="' + CALENDLY_URL + '" target="_blank" rel="noopener" style="text-decoration:none;display:block;"><button class="btn btn-outline">Book a Free Strategy Call</button></a>'
+    + '</div>'
+    + '<p style="font-size:11px;color:rgba(255,255,255,.14);text-align:center;line-height:1.6;margin-top:8px;">© ' + new Date().getFullYear() + ' Fitbodies by MK · Built for the over-40 crowd</p>'
+    + '</div></div>';
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+function attachListeners() {
+  var btnStart = document.getElementById('btn-start');
+  if (btnStart) btnStart.addEventListener('click', function() {
+    state.screen = 'quiz'; state.current = 0; state.selected = null; state.answers = [];
+    render();
+  });
+
+  document.querySelectorAll('.answer-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      state.selected = parseInt(this.getAttribute('data-idx'));
+      document.querySelectorAll('.answer-card').forEach(function(c){ c.classList.remove('selected'); });
+      this.classList.add('selected');
+      var btn = document.getElementById('btn-next');
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  var btnNext = document.getElementById('btn-next');
+  if (btnNext) btnNext.addEventListener('click', function() {
+    if (state.selected === null) return;
+    state.answers.push(QUESTIONS[state.current].answers[state.selected].score);
+    if (state.current < QUESTIONS.length - 1) {
+      state.current++; state.selected = null;
+    } else {
+      state.screen = 'capture'; state.selected = null;
+    }
+    render();
+  });
+
+  var iName  = document.getElementById('input-name');
+  var iEmail = document.getElementById('input-email');
+  if (iName)  iName.addEventListener('input',  function(){ state.name  = this.value; });
+  if (iEmail) iEmail.addEventListener('input', function(){ state.email = this.value; });
+
+  var btnSubmit = document.getElementById('btn-submit');
+  if (btnSubmit) btnSubmit.addEventListener('click', function() {
+    state.name  = (document.getElementById('input-name')  || {}).value || '';
+    state.email = (document.getElementById('input-email') || {}).value || '';
+
+    if (!state.email || !state.email.includes('@')) {
+      state.error = 'Please enter a valid email address.';
+      render(); return;
+    }
+
+    // No Formspree ID yet — skip straight to results
+    if (FORMSPREE_URL.indexOf('YOUR_FORM_ID') !== -1) {
+      state.screen = 'results'; render(); return;
+    }
+
+    state.submitting = true; state.error = ''; render();
+
+    fetch(FORMSPREE_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name:     state.name,
+        email:    state.email,
+        result:   RESULTS[getResultKey()].label,
+        score:    getTotal() + ' / ' + (QUESTIONS.length * 3),
+        _subject: 'New Body Check — ' + RESULTS[getResultKey()].label + ' · ' + state.name,
+        _replyto: state.email,
+      }),
+    })
+    .then(function(r){ return r.json(); })
+    .then(function() { state.submitting = false; state.screen = 'results'; render(); })
+    .catch(function() { state.submitting = false; state.screen = 'results'; render(); });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
